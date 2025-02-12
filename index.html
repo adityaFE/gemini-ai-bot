@@ -11,7 +11,14 @@
 </head>
 
 <body>
-  <div class="container">
+  <div id="api-key-entry">
+    <input type="text" id="api-key-input" placeholder="Enter API Key">
+    <button id="api-key-submit">Submit</button>
+    <p id="help-text">Make sure to enter your API key properly.</p>
+    <h1 id="warning-message" style="display: none;">Please enter a valid API key.</h1>
+  </div>
+
+  <div class="container" style="display: none">
     <header class="app-header">
       <h1 class="heading">
         Hello There

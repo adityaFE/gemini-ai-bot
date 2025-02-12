@@ -6,8 +6,28 @@ const fileInput = promptForm.querySelector('#file-input');
 const fileUploadWrapper = promptForm.querySelector('.file-upload-wrapper');
 const themeToggle = document.querySelector('#theme-toggle-btn');
 
-const API_KEY = '';
-const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`
+const apiKeyInput = document.querySelector("#api-key-input");
+const submitApiKey = document.querySelector('#api-key-submit');
+const warningMessage = document.querySelector("#warning-message");
+let API_KEY = "";
+let API_URL = "";
+
+submitApiKey.addEventListener('click', () => {
+  API_KEY = apiKeyInput.value.trim();
+  if (!API_KEY) {
+    warningMessage.style.display = "block";
+    return;
+  }
+
+  warningMessage.style.display = "none";
+  API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
+
+  if (confirm(`Your API key is: ${API_KEY}. Do you want to proceed?`)) {
+    document.querySelector("#api-key-entry").style.display = "none";
+    container.style.display = "block";
+  }
+});
+
 
 let typingInterval, controller
 const chatHistory = []
@@ -61,6 +81,7 @@ const generateResponse = async (botMsgDiv) => {
     })
 
     const data = await response.json()
+    console.log(data)
     if (!response.ok) throw new Error(data.error.message)
 
     const responseText = data.candidates[0].content.parts[0].text.replace(/\*\*([^*]+)\*\*/g, "$1").trim()
@@ -72,7 +93,7 @@ const generateResponse = async (botMsgDiv) => {
     })
   } catch (error) {
     textElement.style.color = "#d62939"
-    textElement.textContent = error.name === "AbortError" ? "Request cancelled" : error.message
+    textElement.textContent = error.name === "AbortError" ? "Request cancelled" : error.message + " Please refresh the page to re-enter the API KEY or try again later."
     botMsgDiv.classList.remove('loading')
     document.body.classList.remove("bot-responding")
     scrollToBottom()
@@ -84,6 +105,7 @@ const generateResponse = async (botMsgDiv) => {
 const handleFormSubmit = (e) => {
   e.preventDefault();
   const userMessage = promptInput.value.trim()
+
   if (!userMessage || document.body.classList.contains("bot-responding")) return
 
   promptInput.value = ''
