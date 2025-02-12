@@ -11,6 +11,7 @@ const submitApiKey = document.querySelector('#api-key-submit');
 const warningMessage = document.querySelector("#warning-message");
 let API_KEY = "";
 let API_URL = "";
+let scrollAutomatically = true
 
 submitApiKey.addEventListener('click', () => {
   API_KEY = apiKeyInput.value.trim();
@@ -40,7 +41,20 @@ const createMsgElement = (content, ...classes) => {
   return div;
 }
 
-const scrollToBottom = () => container.scrollTo({top: container.scrollHeight, behavior: 'smooth'})
+const scrollToBottom = () => {
+
+  const chatsContainer = document.querySelector(".chats-container");
+  ['wheel', 'touchstart', 'touchmove', 'touchend'].forEach(eventType => {
+    chatsContainer.addEventListener(eventType, () => {
+      scrollAutomatically = false;
+    });
+  });
+
+  if (scrollAutomatically) {container.scrollTo({top: container.scrollHeight, behavior: 'smooth'})}
+
+}
+
+
 
 const typingEffect = (text, textElement, botMsgDiv) => {
   textElement.textContent = ''
