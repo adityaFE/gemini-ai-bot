@@ -1,5 +1,3 @@
-const TEST_MODE = false; // Set to true to enable test mode
-
 //hardcoding some random sentences
 const testResponse= `
 This home office setup aims for functionality and comfort under a $1000 budget. Prices are estimates and may vary based on sales and location.
@@ -67,9 +65,27 @@ const themeToggle = document.querySelector("#theme-toggle-btn");
 const apiKeyInput = document.querySelector("#api-key-input");
 const submitApiKey = document.querySelector("#api-key-submit");
 const warningMessage = document.querySelector("#warning-message");
+
+const testModeToggle = document.querySelector("#test-mode-toggle");
+const apiKeyEntry = document.querySelector("#api-key-entry");
+
+const isTestMode = localStorage.getItem("testMode") === "true";
+testModeToggle.checked = isTestMode;
+
 let API_KEY = "";
 let API_URL = "";
 let scrollAutomatically = true;
+
+if (isTestMode) {
+  apiKeyEntry.style.display = "none";
+  container.style.display = "block";
+}
+
+testModeToggle.addEventListener("change", () => {
+  const enabled = testModeToggle.checked;
+  localStorage.setItem("testMode", enabled);
+  location.reload(); // Reload page to apply changes
+});
 
 submitApiKey.addEventListener("click", () => {
   API_KEY = apiKeyInput.value.trim();
@@ -134,7 +150,7 @@ const generateResponse = async (botMsgDiv) => {
   const textElement = botMsgDiv.querySelector(".message-text");
   controller = new AbortController();
 
-  if (TEST_MODE) {
+  if (isTestMode) {
     // hardcoded test responses
     const testResponses = [
       testResponse,
