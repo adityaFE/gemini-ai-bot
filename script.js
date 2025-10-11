@@ -1,5 +1,5 @@
 //hardcoding some random sentences
-const testResponse= `
+const testResponse = `
 This home office setup aims for functionality and comfort under a $1000 budget. Prices are estimates and may vary based on sales and location.
 
 I. Essential Items (approx. $600 - $700):
@@ -53,7 +53,7 @@ Tips for Staying Within Budget:
 
 
 Remember, this is a sample budget and you can adjust it based on your specific needs and preferences. The key is to prioritize functionality and comfort while staying within your budget.
-`
+`;
 const container = document.querySelector(".container");
 const chatsContainer = document.querySelector(".chats-container");
 const promptForm = document.querySelector(".prompt-form");
@@ -95,7 +95,7 @@ submitApiKey.addEventListener("click", () => {
   }
 
   warningMessage.style.display = "none";
-  API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
+  API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`;
 
   if (confirm(`Your API key is: ${API_KEY}. Do you want to proceed?`)) {
     document.querySelector("#api-key-entry").style.display = "none";
@@ -134,7 +134,8 @@ const typingEffect = (text, textElement, botMsgDiv) => {
   let wordIndex = 0;
   typingInterval = setInterval(() => {
     if (wordIndex < words.length) {
-      textElement.textContent += (wordIndex === 0 ? "" : " ") + words[wordIndex++];
+      textElement.textContent +=
+        (wordIndex === 0 ? "" : " ") + words[wordIndex++];
       botMsgDiv.classList.remove("loading");
       document.body.classList.add("bot-responding");
       scrollToBottom();
@@ -158,12 +159,13 @@ const generateResponse = async (botMsgDiv) => {
       testResponse,
       testResponse,
     ];
-    const responseText = testResponses[Math.floor(Math.random() * testResponses.length)];
-    
+    const responseText =
+      testResponses[Math.floor(Math.random() * testResponses.length)];
+
     setTimeout(() => {
       typingEffect(responseText, textElement, botMsgDiv);
     }, 1000);
-    
+
     return;
   }
 
@@ -174,7 +176,9 @@ const generateResponse = async (botMsgDiv) => {
       ...(userData.file.data
         ? [
             {
-              inline_data: (({ fileName, isImage, ...rest }) => rest)(userData.file),
+              inline_data: (({ fileName, isImage, ...rest }) => rest)(
+                userData.file
+              ),
             },
           ]
         : []),
@@ -192,7 +196,9 @@ const generateResponse = async (botMsgDiv) => {
     const data = await response.json();
     if (!response.ok) throw new Error(data.error.message);
 
-    const responseText = data.candidates[0].content.parts[0].text.replace(/\*\*([^*]+)\*\*/g, "$1").trim();
+    const responseText = data.candidates[0].content.parts[0].text
+      .replace(/\*\*([^*]+)\*\*/g, "$1")
+      .trim();
     typingEffect(responseText, textElement, botMsgDiv);
 
     chatHistory.push({
@@ -204,7 +210,8 @@ const generateResponse = async (botMsgDiv) => {
     textElement.textContent =
       error.name === "AbortError"
         ? "Request cancelled"
-        : error.message + " Please refresh the page to re-enter the API KEY or try again later.";
+        : error.message +
+          " Please refresh the page to re-enter the API KEY or try again later.";
     botMsgDiv.classList.remove("loading");
     document.body.classList.remove("bot-responding");
     scrollToBottom();
@@ -217,7 +224,8 @@ const handleFormSubmit = (e) => {
   e.preventDefault();
   const userMessage = promptInput.value.trim();
 
-  if (!userMessage || document.body.classList.contains("bot-responding")) return;
+  if (!userMessage || document.body.classList.contains("bot-responding"))
+    return;
 
   promptInput.value = "";
   userData.message = userMessage;
@@ -253,76 +261,88 @@ const handleFormSubmit = (e) => {
     `;
     const botMsgDiv = createMsgElement(botMsgHTML, "bot-message", "loading");
     chatsContainer.appendChild(botMsgDiv);
-    
-    scrollToBottom();  
+
+    scrollToBottom();
     generateResponse(botMsgDiv);
   }, 1000);
 };
 
-fileInput.addEventListener('change', (e) => {
-  const file = fileInput.files[0]
-  if (!file) return
+fileInput.addEventListener("change", (e) => {
+  const file = fileInput.files[0];
+  if (!file) return;
 
-  const isImage = file.type.startsWith('image/')
-  const reader = new FileReader()
-  reader.readAsDataURL(file)
+  const isImage = file.type.startsWith("image/");
+  const reader = new FileReader();
+  reader.readAsDataURL(file);
 
   reader.onload = () => {
-    fileInput.value = ""
-    const base64String = reader.result.split(",")[1]
-    fileUploadWrapper.querySelector('.file-preview').src = reader.result
-    fileUploadWrapper.classList.add('active', isImage ? 'img-attached' : 'file-attached')
+    fileInput.value = "";
+    const base64String = reader.result.split(",")[1];
+    fileUploadWrapper.querySelector(".file-preview").src = reader.result;
+    fileUploadWrapper.classList.add(
+      "active",
+      isImage ? "img-attached" : "file-attached"
+    );
 
-    userData.file = {fileName: file.name, data: base64String, mime_type: file.type, isImage}
-  }
-})
+    userData.file = {
+      fileName: file.name,
+      data: base64String,
+      mime_type: file.type,
+      isImage,
+    };
+  };
+});
 
-document.querySelector("#cancel-file-btn").addEventListener('click', () => {
-  userData.file = {}
-  fileUploadWrapper.classList.remove('active', 'img-attached', 'file-attached')
-})
+document.querySelector("#cancel-file-btn").addEventListener("click", () => {
+  userData.file = {};
+  fileUploadWrapper.classList.remove("active", "img-attached", "file-attached");
+});
 
-document.querySelector("#stop-response-btn").addEventListener('click', () => {
-  userData.file = {}
-  controller?.abort()
-  clearInterval(typingInterval)
+document.querySelector("#stop-response-btn").addEventListener("click", () => {
+  userData.file = {};
+  controller?.abort();
+  clearInterval(typingInterval);
   const loadingBotMsg = chatsContainer.querySelector(".bot-message.loading");
   if (loadingBotMsg) {
-    loadingBotMsg.classList.remove('loading');
+    loadingBotMsg.classList.remove("loading");
   }
 
   document.body.classList.remove("bot-responding");
-})
+});
 
-document.querySelector("#delete-chats-btn").addEventListener('click', () => {
-  chatHistory.length = 0
-  chatsContainer.innerHTML = ""
-  document.body.classList.remove("bot-responding", "chats-active")
-})
+document.querySelector("#delete-chats-btn").addEventListener("click", () => {
+  chatHistory.length = 0;
+  chatsContainer.innerHTML = "";
+  document.body.classList.remove("bot-responding", "chats-active");
+});
 
-document.querySelectorAll(".suggestions-item").forEach(item => {
-  item.addEventListener('click', () => {
-    promptInput.value = item.querySelector(".text").textContent
-    promptForm.dispatchEvent(new Event('submit'))
-  })
-})
+document.querySelectorAll(".suggestions-item").forEach((item) => {
+  item.addEventListener("click", () => {
+    promptInput.value = item.querySelector(".text").textContent;
+    promptForm.dispatchEvent(new Event("submit"));
+  });
+});
 
-document.addEventListener('click', ({target}) => {
-  const wrapper = document.querySelector('.prompt-wrapper')
-  const shouldHide = target.classList.contains('prompt-input') || (wrapper.classList.contains('hide-controls') &&
-    (target.id === 'add-file-btn' || target.id === 'stop-response-btn'))
-  wrapper.classList.toggle('hide-controls', shouldHide)
-})
+document.addEventListener("click", ({ target }) => {
+  const wrapper = document.querySelector(".prompt-wrapper");
+  const shouldHide =
+    target.classList.contains("prompt-input") ||
+    (wrapper.classList.contains("hide-controls") &&
+      (target.id === "add-file-btn" || target.id === "stop-response-btn"));
+  wrapper.classList.toggle("hide-controls", shouldHide);
+});
 
-themeToggle.addEventListener('click', () => {
-  const isLightTheme = document.body.classList.toggle('light-theme')
-  localStorage.setItem("themeColor", isLightTheme ? "light_mode" : "dark_mode")
-  themeToggle.textContent = isLightTheme ? "dark_mode" : "light_mode"
-})
+themeToggle.addEventListener("click", () => {
+  const isLightTheme = document.body.classList.toggle("light-theme");
+  localStorage.setItem("themeColor", isLightTheme ? "light_mode" : "dark_mode");
+  themeToggle.textContent = isLightTheme ? "dark_mode" : "light_mode";
+});
 
-const isLightTheme = localStorage.getItem("themeColor") === "light_mode"
-document.body.classList.toggle('light-theme', isLightTheme)
-themeToggle.textContent = isLightTheme ? "dark_mode" : "light_mode"
+const isLightTheme = localStorage.getItem("themeColor") === "light_mode";
+document.body.classList.toggle("light-theme", isLightTheme);
+themeToggle.textContent = isLightTheme ? "dark_mode" : "light_mode";
 
-promptForm.addEventListener('submit', handleFormSubmit)
-promptForm.querySelector('#add-file-btn').addEventListener('click', () => fileInput.click())
+promptForm.addEventListener("submit", handleFormSubmit);
+promptForm
+  .querySelector("#add-file-btn")
+  .addEventListener("click", () => fileInput.click());
